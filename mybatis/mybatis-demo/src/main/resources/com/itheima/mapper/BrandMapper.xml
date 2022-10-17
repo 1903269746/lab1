@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace：名称空间-->
+<mapper namespace="com.itheima.mapper.BrandMapper">
+
+    <!--
+        数据库表的字段名  和  实体类的属性名  不一样，则不能封装
+        *起别名:对不一样的列名起别名，使其与类的属性名相同，不方便
+
+        *用resultMap
+                1.定义resultMap标签
+                2.在<select>标签中，使用resultMap属性替换resultType属性
+        -->
+    <!--id:唯一标识
+        type：映射的类型，支持别名
+    -->
+    <resultMap id="brandResultMap" type="brand">
+        <!--
+        id:完成主键字段的映射
+            column：表的列名
+            property：实体类的属性名
+        -->
+        <result column="brand_name" property="brandName"/>
+        <result column="company_name" property="companyName"/>
+        <result column="statu" property="status"/>
+    </resultMap>
+
+
+    <!--查询所有-->
+    <select id="selectAll" resultMap="brandResultMap">
+        select
+            *
+        from tb_brand;
+    </select>
+
+        <!--按id查询-->
+    <!--
+        *参数占位符
+        1.#{}：会将其替换为?,为了防止sql注入
+        2.${}：拼sql，会存在sql注入问题
+        3.使用时间
+            *传递参数的时候：#{}
+            *表名或列名不固定
+
+            *特殊字符处理：
+            1.转义字符：<  &lt
+            2.CDATA区：输入CD按enter
+    -->
+    <select id="selectById" resultMap="brandResultMap">
+        select *
+        from tb_brand where id =#{id};
+    </select>
+
+    <!--条件查询-->
+    <!--
+    <select id="selectByCondition" resultMap="brandResultMap">
+        select *
+        from tb_brand
+        where statu = #{status}
+          and   company_name like #{companyName}
+          and   brand_name  like #{brandName}
+        ;
+    </select>-->
+    
+    <!--
+    动态条件查询
+        *if:条件判断
+            *test：逻辑表达式
+        *问题：
+            *解决方式1：在where后面加恒等式  1 = 1
+            *解决方法2：<where>标签替换where关键字
+    -->
+    <select id="selectByCondition" resultMap="brandResultMap">
+        select *
+        from tb_brand
+        <where>
+            <if test="status!=null">
+                statu=#{status}
+            </if>
+            <if test="companyName != null and companyName != ''">and   company_name like #{companyName}</if>
+            <if test="brandName != null and brandName !=''">and   brand_name  like #{brandName}</if>
+            ;
+        </where>
+    </select>
+
+    <!--单条件动态查询
+
+    -->
+    <select id="selectByConditionSingle" resultMap="brandResultMap">
+        select *
+        from tb_brand
+       <where>
+           <choose>  <!--相当于Switch-->
+               <when test="status!=null"> <!--相当于case-->
+                   statu=#{status}
+               </when>
+                <when test="companyName!=null and companyName!=''">
+                    and   company_name like #{companyName}
+                </when>
+                <when test="brandName!=null and brandName!=''">
+                    and   brand_name like #{brandName}
+                </when>
+
+           </choose>
+       </where>
+    </select>
+
+    
+    <!--添加
+        *useGeneratedKeys=”true“ keyProperty="id"返回添加数据的主键，id为主键属性名称57
+        在MyBatisTes里面用brand.getId() 来获取
+    -->
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        insert into  tb_brand(brand_name,company_name,ordered,description,statu)
+        values (#{brandName},#{companyName},#{ordered},#{description},#{status});
+    </insert>
+
+    <!--更新-->
+    <update id="update">
+        update tb_brand
+        <set>
+            <if test="status!=null">
+                statu=#{status},
+            </if>
+            <if test="companyName != null and companyName != ''">  company_name = #{companyName},</if>
+            <if test="brandName != null and brandName !=''"> brand_name  = #{brandName},</if>
+            <if test="ordered != null">ordered = #{ordered},</if>
+            <if test="description != null and description != ''">description = #{description}</if>
+        </set>
+            where id = #{id};
+    </update>
+
+    <!--删除-->
+    <delete id="deleteById">
+        delete from tb_brand
+        where id = #{id};
+    </delete>
+
+    <!--批量删除
+        mybatis会将数组参数封装成一个Map集合
+            *默认：array=数组,及collection=array
+            *使用@Param注解改变map集合的默认key的名称
+            void deleteByIds(@Param("ids") int[] ids)
+    -->
+    <delete id="deleteByIds">
+        delete from tb_brand
+        where id
+        in
+            <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+
+    </delete>
+</mapper>
+
+<!--在方法中使用@Param("xxx") int xxx  其中第一个xxx要和占位符中的内容相同-->

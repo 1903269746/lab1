@@ -1,0 +1,6 @@
+com\itheima\mapper_demo2.class
+com\itheima\pojo\User.class
+com\itheima\demo.class
+com\itheima\mapper\BrandMapper.class
+com\itheima\mapper\UserMapper.class
+com\itheima\pojo\Brand.class

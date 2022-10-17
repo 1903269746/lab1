@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.wolfcode.dao.UserDao">
+    <delete id="deleteByUcode">
+        delete from t_user where ucode=#{ucode}
+    </delete>
+
+    <select id="select" resultType="java.lang.Integer">
+        select count(1) from t_user
+    </select>
+
+    <select id="selectUserByCondition" parameterType="java.lang.String" resultType="cn.wolfcode.entity.T_User">
+        select * from t_user where ucode=#{str} or uphone=#{str}
+    </select>
+
+    <update id="updateUser" parameterType="java.util.Map" >
+        update t_user set ustatus=#{ustatus} where ucode=#{ucode}
+    </update>
+
+
+    <insert id="addUser" parameterType="cn.wolfcode.entity.T_User" >
+    insert into t_user values(#{ucode},#{uname},null,#{usex},#{ubirthday},#{uphone},null,1,#{upwd},#{uaddress},#{rid})
+    </insert>
+
+    <select id="selectAll" resultType="cn.wolfcode.entity.T_User">
+        select * from t_user
+    </select>
+
+    <select id="selectByUcode" resultType="cn.wolfcode.entity.T_User">
+        select * from t_user where ucode=#{ucode}
+    </select>
+    <select id="selectBySingle" resultType="cn.wolfcode.entity.T_User">
+        select * from t_user where ucode like concat('%',#{str},'%')
+                                or uname like  concat('%',#{str},'%')
+                                or uphone like  concat('%',#{str},'%')
+    </select>
+
+    <update id="editUser" parameterType="cn.wolfcode.entity.T_User">
+    update t_user set uname=#{uname},usex=#{usex},ubirthday=#{ubirthday},uphone=#{uphone},uaddress=#{uaddress},rid=#{rid},ustatus=#{ustatus}
+    where ucode = #{ucode}
+    </update>
+<!--    <update id="editUser" parameterType="cn.wolfcode.entity.T_User">-->
+<!--        update t_user-->
+<!--            <set>-->
+<!--        <if test="uname != null and uname != ''">-->
+<!--            uname = #{uname}-->
+<!--        </if>-->
+<!--         <if test="usex != null and usex != ''">-->
+<!--                usex = #{usex}-->
+<!--        </if>-->
+<!--                <if test="ubirthday != null and ubirthday != ''">-->
+<!--                    ubirthday = #{ubirthday}-->
+<!--                </if>-->
+<!--                <if test="uphone != null and uphone != ''">-->
+<!--                    uphone = #{uphone}-->
+<!--                </if>-->
+<!--                <if test="uaddress != null and uaddress != ''">-->
+<!--                    uaddress=#{uaddress}-->
+<!--                </if>-->
+<!--                <if test="rid != null and rid != ''">-->
+<!--                    rid = #{rid}-->
+<!--                </if>-->
+<!--                <if test="ustatus != null and ustatus != ''">-->
+<!--                    utatus = #{utatus}-->
+<!--                </if>-->
+<!--            </set>-->
+<!--            <where>-->
+<!--                ucode=#{ucode}-->
+<!--            </where>-->
+<!--    </update>-->
+</mapper>
